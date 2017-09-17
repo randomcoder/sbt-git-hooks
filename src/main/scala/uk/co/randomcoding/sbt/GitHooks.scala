@@ -21,6 +21,7 @@ import java.nio.file.{Files, StandardCopyOption}
 
 import sbt.Keys._
 import sbt._
+import sbt.internal.util.ManagedLogger
 
 import scala.util.Properties
 
@@ -32,29 +33,33 @@ object GitHooks extends AutoPlugin {
     val writeHooks = taskKey[Unit]("Write Git Hooks")
     val hooksSourceDir = settingKey[Option[File]]("Directory containing pre written git hooks")
     val gitHooksDir = settingKey[Option[File]]("Directory to write the git hooks to")
-
-    lazy val gitHooksSettings: Seq[Def.Setting[_]] = Seq(
-      hooksSourceDir in writeHooks := None,
-      writeHooks := {
-        val hooksSource = (hooksSourceDir in writeHooks).value.getOrElse(baseDirectory.value / "hooks")
-        val targetDirectory = (gitHooksDir in writeHooks).value.getOrElse(baseDirectory.value / ".git" / "hooks")
-
-        streams.value.log.info(s"Writing hooks from $hooksSource to $targetDirectory")
-        WriteGitHooks(hooksSource, targetDirectory)
-        streams.value.log.info(s"Successfully written hooks from $hooksSource to $targetDirectory")
-      }
-    )
   }
 
   import autoImport._
-  override val projectSettings: Seq[Setting[_]] = inConfig(Compile)(gitHooksSettings)
+
+  lazy val writeHooksTask = Def.task  {
+    val hooksSource = hooksSourceDir.value.getOrElse(file("git-hooks"))
+    val targetDirectory = gitHooksDir.value.getOrElse(file(".git/hooks"))
+
+    WriteGitHooks(hooksSource, targetDirectory, streams.value.log)
+  }
+
+  lazy val gitHooksSettings: Seq[Def.Setting[_]] = Seq(
+    hooksSourceDir := None,
+    gitHooksDir := None,
+    writeHooks := writeHooksTask.value
+  )
+
+  override val globalSettings: Seq[Setting[_]] = gitHooksSettings
 }
 
 object WriteGitHooks {
 
-  def apply(hooksSourceDir: File, hooksTargetDir: File): Unit = {
+  def apply(hooksSourceDir: File, hooksTargetDir: File, log: ManagedLogger): Unit = {
+    log.info(s"Copying hooks from ${hooksSourceDir.getAbsolutePath} into ${hooksTargetDir.getAbsolutePath}")
     Option(hooksSourceDir.listFiles).map(_.toList).getOrElse(Nil).foreach { hook =>
       val hookTarget = hooksTargetDir.toPath.resolve(hook.getName)
+      log.info(s"Copying ${hook.getName} to $hookTarget")
       Files.copy(hook.toPath, hookTarget, StandardCopyOption.REPLACE_EXISTING)
       if (!Properties.isWin) Files.setPosixFilePermissions(hookTarget, PosixFilePermissions.fromString("rwxr-xr-x"))
     }
