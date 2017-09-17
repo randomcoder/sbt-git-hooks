@@ -1,0 +1,10 @@
+language: scala
+scala:
+   - 2.12.3
+jdk:
+  - oraclejdk8
+notifications:
+  email:
+    recipients:
+      - randomcoder@randomcoding.co.uk
+sudo: false
