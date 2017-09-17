@@ -1,6 +1,6 @@
 name := "sbt-git-hooks"
 
-version := "0.1.0"
+version := "0.1.0-SNAPSHOT"
 
 scalaVersion := "2.12.3"
 
