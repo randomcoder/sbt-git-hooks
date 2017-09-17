@@ -53,7 +53,7 @@ object GitHooks extends AutoPlugin {
 object WriteGitHooks {
 
   def apply(hooksSourceDir: File, hooksTargetDir: File): Unit = {
-    hooksSourceDir.listFiles.foreach { hook =>
+    Option(hooksSourceDir.listFiles).map(_.toList).getOrElse(Nil).foreach { hook =>
       val hookTarget = hooksTargetDir.toPath.resolve(hook.getName)
       Files.copy(hook.toPath, hookTarget, StandardCopyOption.REPLACE_EXISTING)
       if (!Properties.isWin) Files.setPosixFilePermissions(hookTarget, PosixFilePermissions.fromString("rwxr-xr-x"))
