@@ -2,8 +2,11 @@
 
 [![Build Status](https://travis-ci.org/randomcoder/sbt-git-hooks.svg?branch=master)](https://travis-ci.org/randomcoder/sbt-git-hooks)
 
-SBT auto plugin to use [Gherkin Converter](https://github.com/randomcoder/git-hooks) to generate html from
-`.feature` files.
+SBT auto plugin to manage git hooks from within the project. This plugin will copy any files from the
+`git-hooks` directory into `.git/hooks` and ensure they are executable.
+
+See the git hooks [documentation](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks) for details on
+the hooks that are available.
 
 ### How to use
 
@@ -14,6 +17,8 @@ Add the plugin to your build with the following in `project/plugins.sbt`:
 ```
 addSbtPlugin("uk.co.randomcoding" % "sbt-git-hooks" % "0.1.0")
 ```
+
+Then run the task `writeHooks` to copy the hooks into `.git/hooks`
 
 ### Licence
 
