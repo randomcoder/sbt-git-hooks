@@ -56,12 +56,14 @@ object GitHooks extends AutoPlugin {
 object WriteGitHooks {
 
   def apply(hooksSourceDir: File, hooksTargetDir: File, log: ManagedLogger): Unit = {
-    log.info(s"Copying hooks from ${hooksSourceDir.getAbsolutePath} into ${hooksTargetDir.getAbsolutePath}")
-    Option(hooksSourceDir.listFiles).map(_.toList).getOrElse(Nil).foreach { hook =>
-      val hookTarget = hooksTargetDir.toPath.resolve(hook.getName)
-      log.info(s"Copying ${hook.getName} to $hookTarget")
-      Files.copy(hook.toPath, hookTarget, StandardCopyOption.REPLACE_EXISTING)
-      if (!Properties.isWin) Files.setPosixFilePermissions(hookTarget, PosixFilePermissions.fromString("rwxr-xr-x"))
-    }
+    if (hooksTargetDir.exists()) {
+      log.info(s"Copying hooks from ${hooksSourceDir.getAbsolutePath} into ${hooksTargetDir.getAbsolutePath}")
+      Option(hooksSourceDir.listFiles).map(_.toList).getOrElse(Nil).foreach { hook =>
+        val hookTarget = hooksTargetDir.toPath.resolve(hook.getName)
+        log.info(s"Copying ${hook.getName} to $hookTarget")
+        Files.copy(hook.toPath, hookTarget, StandardCopyOption.REPLACE_EXISTING)
+        if (!Properties.isWin) Files.setPosixFilePermissions(hookTarget, PosixFilePermissions.fromString("rwxr-xr-x"))
+      }
+    } else log.info(s"${hooksTargetDir.getPath} does not exist (possibly within a submodule). Not writing any hooks.")
   }
 }
