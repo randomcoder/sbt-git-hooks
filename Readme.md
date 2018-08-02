@@ -10,12 +10,12 @@ the hooks that are available.
 
 ### How to use
 
-`sbt-git-hooks` is an auto plugin for SBT 1.0.
+`sbt-git-hooks` is an auto plugin for SBT 1.1.x
 
 Add the plugin to your build with the following in `project/plugins.sbt`:
 
 ```
-addSbtPlugin("uk.co.randomcoding" % "sbt-git-hooks" % "0.1.0")
+addSbtPlugin("uk.co.randomcoding" % "sbt-git-hooks" % "0.2.0")
 ```
 
 Then run the task `writeHooks` to copy the hooks into `.git/hooks`
