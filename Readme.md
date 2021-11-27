@@ -20,7 +20,7 @@ addSbtPlugin("uk.co.randomcoding" % "sbt-git-hooks" % "0.2.0")
 
 Then run the task `writeHooks` to copy the hooks into `.git/hooks`.
 
-**Note**: Everytime there are modifications to custom git hooks, you are expected to run this `writeHooks` sbt task. This requirement however could be automated by invoking this task on every sbt load by adding following code to `build.sbt`:
+**Note**: Everytime there are modifications to custom git hooks, you are expected to run this `writeHooks` sbt task. This requirement however could be automated by invoking this task on every sbt load. To do so add following code to `build.sbt`:
 ```scala
 lazy val startupTransition: State => State = { s: State =>
   "writeHooks" :: s
@@ -32,7 +32,7 @@ onLoad in Global := {
 }
 ```
 
-Now if you run `sbt` in your repository directory, `writeHooks` task will automically be called and your updated custom git hooks will be copied out-of-the-box.
+Now if you run `sbt` in your repository directory, `writeHooks` task will automically be called and your updated custom git hooks will be copied to `.git/hooks` out-of-the-box.
 
 ### Licence
 
