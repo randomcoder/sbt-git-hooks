@@ -18,11 +18,11 @@ package uk.co.randomcoding.sbt
 
 import java.nio.file.attribute.PosixFilePermissions
 import java.nio.file.{Files, StandardCopyOption}
-
 import sbt.Keys._
 import sbt._
 import sbt.internal.util.ManagedLogger
 
+import scala.sys.process.Process
 import scala.util.Properties
 
 object GitHooks extends AutoPlugin {
@@ -39,7 +39,7 @@ object GitHooks extends AutoPlugin {
 
   lazy val writeHooksTask = Def.task  {
     val hooksSource = hooksSourceDir.value.getOrElse(file("git-hooks"))
-    val targetDirectory = gitHooksDir.value.getOrElse(file(".git/hooks"))
+    val targetDirectory = gitHooksDir.value.getOrElse(file(Process("git rev-parse --git-path hooks").!!))
 
     WriteGitHooks(hooksSource, targetDirectory, streams.value.log)
   }
